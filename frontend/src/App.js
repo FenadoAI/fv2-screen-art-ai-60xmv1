@@ -105,7 +105,7 @@ const WallpaperCard = ({ wallpaper, onPreview }) => (
 
 const Home = () => {
   const [prompt, setPrompt] = useState("");
-  const [style, setStyle] = useState("");
+  const [style, setStyle] = useState("none");
   const [phoneModel, setPhoneModel] = useState("iPhone");
   const [generating, setGenerating] = useState(false);
   const [currentWallpaper, setCurrentWallpaper] = useState(null);
@@ -132,7 +132,7 @@ const Home = () => {
     try {
       const response = await axios.post(`${API}/wallpapers/generate`, {
         prompt: prompt.trim(),
-        style: style || undefined,
+        style: style && style !== "none" ? style : undefined,
         aspect_ratio: "9:16",
         megapixels: "1"
       });
@@ -213,7 +213,7 @@ const Home = () => {
                       <SelectValue placeholder="Choose a style" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">No specific style</SelectItem>
+                      <SelectItem value="none">No specific style</SelectItem>
                       {styleOptions.map((option) => (
                         <SelectItem key={option} value={option.toLowerCase()}>
                           {option}
