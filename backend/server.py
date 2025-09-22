@@ -257,12 +257,9 @@ async def generate_wallpaper(request: WallpaperRequest):
         )
 
         if not image_result["success"]:
-            return WallpaperResponse(
-                success=False,
-                id=wallpaper_id,
-                prompt=request.prompt,
-                error=image_result.get("error", "Failed to generate image")
-            )
+            # Raise HTTP exception instead of returning error response
+            error_msg = image_result.get("error", "Failed to generate image")
+            raise HTTPException(status_code=503, detail=error_msg)
 
         # Store in database
         wallpaper = Wallpaper(
@@ -283,14 +280,12 @@ async def generate_wallpaper(request: WallpaperRequest):
             preview_url=image_result["image_url"]
         )
 
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
     except Exception as e:
         logger.error(f"Error generating wallpaper: {e}")
-        return WallpaperResponse(
-            success=False,
-            id="",
-            prompt=request.prompt,
-            error=str(e)
-        )
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @api_router.get("/wallpapers", response_model=List[WallpaperResponse])

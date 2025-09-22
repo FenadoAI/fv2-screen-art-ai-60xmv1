@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Separator } from "./components/ui/separator";
 import { ScrollArea } from "./components/ui/scroll-area";
 import { Skeleton } from "./components/ui/skeleton";
-import { Smartphone, Palette, Download, Sparkles, Grid3x3, Wand2 } from "lucide-react";
+import { Smartphone, Palette, Download, Sparkles, Grid3x3, Wand2, AlertCircle } from "lucide-react";
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 const API = `${API_BASE}/api`;
@@ -111,6 +111,7 @@ const Home = () => {
   const [currentWallpaper, setCurrentWallpaper] = useState(null);
   const [wallpapers, setWallpapers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const styleOptions = [
     "Minimalist",
@@ -129,6 +130,7 @@ const Home = () => {
     if (!prompt.trim()) return;
 
     setGenerating(true);
+    setError(null); // Clear previous errors
     try {
       const response = await axios.post(`${API}/wallpapers/generate`, {
         prompt: prompt.trim(),
@@ -143,6 +145,14 @@ const Home = () => {
       }
     } catch (error) {
       console.error("Error generating wallpaper:", error);
+
+      // Extract error message from API response
+      const errorMessage = error.response?.data?.detail ||
+                          error.response?.data?.error ||
+                          error.message ||
+                          "Failed to generate wallpaper";
+
+      setError(errorMessage);
     }
     setGenerating(false);
   };
@@ -254,6 +264,18 @@ const Home = () => {
                     </>
                   )}
                 </Button>
+
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-start">
+                      <AlertCircle className="w-5 h-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="text-red-800 font-medium">Error generating wallpaper</h4>
+                        <p className="text-red-700 text-sm mt-1">{error}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
