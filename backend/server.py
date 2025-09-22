@@ -230,66 +230,13 @@ async def generate_ai_image(prompt: str, aspect_ratio: str = "9:16", megapixels:
         # Create a more detailed prompt for wallpapers
         enhanced_prompt = f"Phone wallpaper, {prompt}, high resolution, vibrant colors, mobile-optimized, stunning visual"
 
-        # Use direct requests to image generation API (simulating MCP call)
-        # In production, this would be replaced with actual MCP integration
-        image_service_url = "https://storage.googleapis.com/fenado-ai-farm-public/generated"
-
-        # For now, we'll use a mix of real API calls and fallback to placeholder
-        try:
-            # Generate a realistic wallpaper URL based on the prompt
-            wallpaper_id = str(uuid.uuid4())
-            # Use high-resolution unsplash images that match the prompt
-            categories = {
-                "sunset": "4046307", "mountain": "7181", "ocean": "393192",
-                "forest": "938618", "space": "9332", "city": "323503",
-                "flower": "4353969", "abstract": "2297744", "nature": "4353963"
-            }
-
-            # Find matching category or use default
-            category = "4353963"  # default nature
-            for key, value in categories.items():
-                if key in prompt.lower():
-                    category = value
-                    break
-
-            # Generate image URL with phone wallpaper dimensions
-            image_url = f"https://source.unsplash.com/1080x1920/?{enhanced_prompt.replace(' ', ',')}&sig={wallpaper_id}"
-
-            # Download and encode image
-            response = requests.get(image_url, timeout=30)
-            if response.status_code == 200:
-                image_data = base64.b64encode(response.content).decode('utf-8')
-                return {
-                    "success": True,
-                    "image_data": image_data,
-                    "image_url": f"data:image/jpeg;base64,{image_data}"
-                }
-            else:
-                # Fallback to placeholder
-                placeholder_url = f"https://picsum.photos/1080/1920?random={wallpaper_id}"
-                response = requests.get(placeholder_url, timeout=10)
-                if response.status_code == 200:
-                    image_data = base64.b64encode(response.content).decode('utf-8')
-                    return {
-                        "success": True,
-                        "image_data": image_data,
-                        "image_url": f"data:image/jpeg;base64,{image_data}"
-                    }
-
-        except Exception as api_error:
-            logger.warning(f"Image generation API error: {api_error}, falling back to placeholder")
-            # Ultimate fallback
-            placeholder_url = f"https://picsum.photos/1080/1920?random={uuid.uuid4()}"
-            response = requests.get(placeholder_url, timeout=10)
-            if response.status_code == 200:
-                image_data = base64.b64encode(response.content).decode('utf-8')
-                return {
-                    "success": True,
-                    "image_data": image_data,
-                    "image_url": f"data:image/jpeg;base64,{image_data}"
-                }
-
-        return {"success": False, "error": "Failed to generate image"}
+        # Check if we have real AI image generation configured
+        # This would require actual MCP integration with image generation services
+        # For now, return an error since we don't have real AI image generation
+        return {
+            "success": False,
+            "error": "AI image generation is not configured. Please set up a real image generation service (e.g., DALL-E, Midjourney, Stable Diffusion) to generate images."
+        }
 
     except Exception as e:
         logger.error(f"Error in AI image generation: {e}")
